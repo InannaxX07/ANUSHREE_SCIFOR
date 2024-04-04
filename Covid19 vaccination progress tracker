@@ -1,0 +1,107 @@
+import numpy as np
+import pandas as pd 
+import matplotlib.pyplot as plt
+import seaborn as sns 
+import plotly.graph_objs as go
+import plotly.figure_factory as ff
+from plotly import tools
+from plotly.offline import download_plotlyjs, init_notebook_mode, plot, iplot
+import plotly.express as px
+init_notebook_mode(connected=True)
+import warnings
+warnings.filterwarnings("ignore")
+data_df = pd.read_csv("/kaggle/input/covid-world-vaccination-progress/country_vaccinations.csv")
+country_vaccine = data_df.groupby(["country", "iso_code", "vaccines"])['total_vaccinations', 
+                                                                       'total_vaccinations_per_hundred',
+                                                                      'daily_vaccinations',
+                                                                      'daily_vaccinations_per_million',
+                                                                      'people_vaccinated',
+                                                                      'people_vaccinated_per_hundred',
+                                                                       'people_fully_vaccinated', 'people_fully_vaccinated_per_hundred'
+                                                                      ].max().reset_index()
+country_vaccine.columns = ["Country", "iso_code", "Vaccines", "Total vaccinations", "Percent", "Daily vaccinations", 
+                           "Daily vaccinations per million", "People vaccinated", "People vaccinated per hundred",
+                           'People fully vaccinated', 'People fully vaccinated percent']
+vaccines = country_vaccine.Vaccines.unique()
+for v in vaccines:
+    countries = country_vaccine.loc[country_vaccine.Vaccines==v, 'Country'].values
+    print(f"Vaccines: {v}: \nCountries: {list(countries)}\n")
+fig = px.choropleth(locations=country_vaccine['Country'], 
+                    locationmode="country names",
+                    color=country_vaccine['Vaccines'],
+                    title="Countries using each vaccine (different colors for each vaccine)",
+                    height = 800
+                   )
+fig.update_layout({'legend_orientation':'v'})
+fig.update_layout({'legend_title':'Vaccine scheme'})
+fig.show()
+vaccine = data_df.groupby(["vaccines"])['total_vaccinations','total_vaccinations_per_hundred',
+                                       'daily_vaccinations','daily_vaccinations_per_million'].max().reset_index()
+vaccine.columns = ["Vaccines", "Total vaccinations", "Percent", "Daily vaccinations", 
+                           "Daily vaccinations per million"]
+def draw_trace_bar_vaccine(data, feature, title, xlab, ylab,color='Blue'):
+    data = data.sort_values(feature, ascending=False)
+    trace = go.Bar(
+            x = data['Vaccines'],
+            y = data[feature],
+            marker=dict(color=color),
+            text=data['Vaccines']
+        )
+    data = [trace]
+ layout = dict(title = title,
+              xaxis = dict(title = xlab, showticklabels=True, tickangle=45, 
+                           zeroline=True, zerolinewidth=1, zerolinecolor='grey',
+                           showline=True, linewidth=2, linecolor='black', mirror=True,
+                          tickfont=dict(
+                            size=10,
+                            color='black'),), 
+              yaxis = dict(title = ylab, gridcolor='lightgrey', zeroline=True, zerolinewidth=1, zerolinecolor='grey',
+                          showline=True, linewidth=2, linecolor='black', mirror=True),
+              plot_bgcolor = 'rgba(0, 0, 0, 0)', paper_bgcolor = 'rgba(0, 0, 0, 0)',
+hovermode = 'closest',
+              height = 800
+             )
+    fig = dict(data = data, layout = layout)
+    iplot(fig, filename='draw_trace')
+draw_trace_bar_vaccine(vaccine, 'Total vaccinations', 'Total per vaccine scheme', 'Vaccine', 'Vaccination total', "darkmagenta" )
+fig = px.treemap(country_vaccine, path = ['Vaccines', 'Country'], values = 'Total vaccinations',
+                title="Total vaccinations per country, grouped by vaccine scheme")
+fig.show()
+fig = px.treemap(country_vaccine, path = ['Vaccines', 'Country'], values = 'Daily vaccinations',
+                title="Daily vaccinations per country, grouped by vaccine scheme")
+fig.show()
+fig = px.treemap(country_vaccine, path = ['Vaccines', 'Country'], values = 'People vaccinated',
+                title="People vaccinated per country, grouped by vaccine scheme")
+fig.show()
+trace = go.Choropleth(
+            locations = country_vaccine['Country'],
+            locationmode='country names',
+            z = country_vaccine['Total vaccinations'],
+            text = country_vaccine['Country'],
+            autocolorscale =False,
+            reversescale = True,
+            colorscale = 'viridis',
+            marker = dict(
+                line = dict(
+                    color = 'rgb(0,0,0)',
+                    width = 0.5)
+            ),
+            colorbar = dict(
+                title = 'Total vaccinations',
+                tickprefix = '')
+        )
+data = [trace]
+layout = go.Layout(
+    title = 'Total vaccinations per country',
+    geo = dict(
+        showframe = True,
+        showlakes = False,
+        showcoastlines = True,
+        projection = dict(
+            type = 'natural earth'
+        )
+    )
+)
+
+fig = dict( data=data, layout=layout )
+iplot(fig)
