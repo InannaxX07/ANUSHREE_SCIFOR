@@ -1,5 +1,5 @@
 # Meta Scifor data science internship submissions 
 
-please find all the submissions in their respective folders
+Please find all the submissions in their respective folders
 
 
