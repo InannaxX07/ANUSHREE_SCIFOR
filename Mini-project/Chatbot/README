@@ -14,3 +14,5 @@ Setup
 
 # Add .env to your .gitignore file if you're using Git:
 echo ".env" >> .gitignore
+
+# To run the streamlit (command): streamlit run gemini_chatbot.py
