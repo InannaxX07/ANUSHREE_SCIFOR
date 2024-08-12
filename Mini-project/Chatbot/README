@@ -2,6 +2,12 @@ Gemini AI Chatbot
 
 This is a simple chatbot using Google's Gemini AI and Streamlit.
 
+ You can now view your Streamlit app in your browser.
+
+  Local URL: http://localhost:8501
+  Network URL: http://10.0.0.7:8501
+
+
 Setup
 1. Install required libraries:
    pip install streamlit google-generativeai python-dotenv
