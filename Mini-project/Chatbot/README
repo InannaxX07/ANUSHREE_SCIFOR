@@ -1,8 +1,8 @@
-# Gemini AI Chatbot
+Gemini AI Chatbot
 
 This is a simple chatbot using Google's Gemini AI and Streamlit.
 
-## Setup
+Setup
 1. Install required libraries:
    pip install streamlit google-generativeai python-dotenv
 
@@ -11,3 +11,6 @@ This is a simple chatbot using Google's Gemini AI and Streamlit.
 
 3. Run the Streamlit app:
    streamlit run gemini_chatbot.py
+
+# Add .env to your .gitignore file if you're using Git:
+echo ".env" >> .gitignore
